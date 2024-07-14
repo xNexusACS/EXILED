@@ -161,8 +161,7 @@ namespace Exiled.CustomModules.API.Features
                 if (IsCustomScp)
                     return true;
 
-                Team? team = Role?.Team;
-                return team.HasValue && team.GetValueOrDefault() == Team.SCPs;
+                return Role?.Team is Team.SCPs;
             }
         }
 
@@ -246,7 +245,7 @@ namespace Exiled.CustomModules.API.Features
         /// Gets a <see cref="IEnumerable{T}"/> of <see cref="EffectType"/>.
         /// </summary>
         /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="EffectType"/>.</returns>
-        public IEnumerable<EffectType> EffectTypes => EnumExtensions.QueryEnumValue<EffectType>();
+        public IEnumerable<EffectType> EffectTypes { get; } = EnumExtensions.QueryValues<EffectType>();
 
         /// <summary>
         /// Gets a value indicating whether the pawn has the <see cref="CustomItem"/> of the specified type.

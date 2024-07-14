@@ -10,6 +10,7 @@ namespace Exiled.Events.Features
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Interfaces;
@@ -51,6 +52,21 @@ namespace Exiled.Events.Features
         /// Gets a <see cref="IReadOnlyList{T}"/> of <see cref="Event{T}"/> which contains all the <see cref="Event{T}"/> instances.
         /// </summary>
         public static IReadOnlyList<Event> List => EventsValue;
+
+        /// <summary>
+        /// Gets a <see cref="IReadOnlyCollection{T}"/> of delegates that are subscribed to the inner event.
+        /// </summary>
+        public IReadOnlyCollection<Delegate> SubscribedPlugins
+        {
+            get
+            {
+                List<Delegate> list = InnerEvent?.GetInvocationList().ToList() ?? new List<Delegate>();
+                if (InnerAsyncEvent != null)
+                    list.AddRange(InnerAsyncEvent.GetInvocationList().ToList());
+
+                return list;
+            }
+        }
 
         /// <summary>
         /// Subscribes a <see cref="CustomEventHandler"/> to the inner event, and checks patches if dynamic patching is enabled.
@@ -193,7 +209,7 @@ namespace Exiled.Events.Features
         }
 
         /// <summary>
-        ///     Runs the coroutine manualy so exceptions can be caught and logged.
+        /// Runs the coroutine manually so exceptions can be caught and logged.
         /// </summary>
         private IEnumerator<float> SafeCoroutineEnumerator(IEnumerator<float> coroutine, CustomAsyncEventHandler handler)
         {

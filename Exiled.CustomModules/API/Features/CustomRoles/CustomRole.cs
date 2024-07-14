@@ -97,7 +97,7 @@ namespace Exiled.CustomModules.API.Features.CustomRoles
         /// Gets a value indicating whether a player can spawn as this <see cref="CustomRole"/> based on its assigned probability.
         /// </summary>
         /// <returns><see langword="true"/> if the probability condition was satisfied; otherwise, <see langword="false"/>.</returns>
-        public bool CanSpawnByProbability => UnityEngine.Random.Range(0, 101) <= Probability;
+        public bool CanSpawnByProbability => Probability.EvaluateProbability();
 
         /// <summary>
         /// Gets all instances of this <see cref="CustomRole"/>.
@@ -516,6 +516,21 @@ namespace Exiled.CustomModules.API.Features.CustomRoles
             Spawn(player, customRole, shouldKeepPosition);
             return true;
         }
+
+        /// <summary>
+        /// Spawns the specified player with the custom role identified by the provided type.
+        /// </summary>
+        /// <typeparam name="T">The type of custom role to be added.</typeparam>
+        /// <param name="player">The <see cref="Pawn"/> to be spawned.</param>
+        /// <returns>
+        /// <see langword="true"/> if the player was spawned with the custom role successfully; otherwise, <see langword="false"/>.
+        /// </returns>
+        /// <remarks>
+        /// This method add the custom role of type <typeparamref name="T"/> assigned to the specified player.
+        /// If the addition operation fails, the method returns <see langword="false"/>.
+        /// </remarks>
+        public static bool Spawn<T>(Pawn player)
+            where T : CustomRole => TryGet(typeof(T), out CustomRole customRole) && customRole.Spawn(player);
 
         /// <summary>
         /// Removes the custom role from the specified player.

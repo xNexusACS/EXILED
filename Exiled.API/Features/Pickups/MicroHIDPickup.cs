@@ -8,9 +8,8 @@
 namespace Exiled.API.Features.Pickups
 {
     using Exiled.API.Extensions;
+    using Exiled.API.Features.Core.Attributes;
     using Exiled.API.Interfaces;
-    using InventorySystem;
-    using UnityEngine;
 
     using BaseMicroHID = InventorySystem.Items.MicroHID.MicroHIDPickup;
 
@@ -45,6 +44,7 @@ namespace Exiled.API.Features.Pickups
         /// <summary>
         /// Gets or sets the MicroHID Energy Level.
         /// </summary>
+        [EProperty(category: nameof(MicroHIDPickup))]
         public float Energy
         {
             get => Base.NetworkEnergy;

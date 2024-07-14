@@ -66,6 +66,11 @@ namespace Exiled.Events.Handlers
         public static Event<BannedEventArgs> Banned { get; set; } = new();
 
         /// <summary>
+        /// Invoked after a <see cref="API.Features.Player"/> is changing danger state.
+        /// </summary>
+        public static Event<ChangingDangerStateEventArgs> ChangingDangerState { get; set; } = new();
+
+        /// <summary>
         /// Invoked before a <see cref="API.Features.Player"/> earns an achievement.
         /// </summary>
         /// <remarks>
@@ -81,7 +86,7 @@ namespace Exiled.Events.Handlers
         /// <summary>
         /// Invoked after a <see cref="API.Features.Player"/> uses an <see cref="API.Features.Items.Usable"/>.
         /// </summary>
-        public static Event<UsingItemCompletedEventArgs> UsingItemCompleted { get; set; } = new ();
+        public static Event<UsingConsumableEventArgs> UsingConsumable { get; set; } = new();
 
         /// <summary>
         /// Invoked after a <see cref="API.Features.Player"/> uses an <see cref="API.Features.Items.Usable"/>.
@@ -161,6 +166,16 @@ namespace Exiled.Events.Handlers
         /// Invoked after hurting a <see cref="API.Features.Player"/>.
         /// </summary>
         public static Event<HurtEventArgs> Hurt { get; set; } = new();
+
+        /// <summary>
+        /// Invoked before a <see cref="API.Features.Player"/> heals.
+        /// </summary>
+        public static Event<HealingEventArgs> Healing { get; set; } = new();
+
+        /// <summary>
+        /// Invoked after a <see cref="API.Features.Player"/> has healed.
+        /// </summary>
+        public static Event<HealedEventArgs> Healed { get; set; } = new();
 
         /// <summary>
         /// Invoked before a <see cref="API.Features.Player"/> dies.
@@ -499,11 +514,6 @@ namespace Exiled.Events.Handlers
         public static Event<DamagingWindowEventArgs> DamagingWindow { get; set; } = new();
 
         /// <summary>
-        /// Invoked before a <see cref="API.Features.Player"/> damage a Door.
-        /// </summary>
-        public static Event<DamagingDoorEventArgs> DamagingDoor { get; set; } = new();
-
-        /// <summary>
         /// Invoked after a <see cref="T:Exiled.API.Features.Player" /> has an item added to their inventory.
         /// </summary>
         public static Event<ItemAddedEventArgs> ItemAdded { get; set; } = new();
@@ -585,6 +595,12 @@ namespace Exiled.Events.Handlers
         public static void OnBanning(BanningEventArgs ev) => Banning.InvokeSafely(ev);
 
         /// <summary>
+        /// Called before a player's danger state changes.
+        /// </summary>
+        /// <param name="ev">The <see cref="ChangingDangerStateEventArgs"/> instance.</param>
+        public static void OnChangingDangerState(ChangingDangerStateEventArgs ev) => ChangingDangerState.InvokeSafely(ev);
+
+        /// <summary>
         /// Called after a player has been banned from the server.
         /// </summary>
         /// <param name="ev">The <see cref="BannedEventArgs"/> instance.</param>
@@ -606,7 +622,7 @@ namespace Exiled.Events.Handlers
         /// Called before completed using of a usable item.
         /// </summary>
         /// <param name="ev">The <see cref="UsingItemEventArgs"/> instance.</param>
-        public static void OnUsingItemCompleted(UsingItemCompletedEventArgs ev) => UsingItemCompleted.InvokeSafely(ev);
+        public static void OnUsingConsumable(UsingConsumableEventArgs ev) => UsingConsumable.InvokeSafely(ev);
 
         /// <summary>
         /// Called after a <see cref="API.Features.Player"/> used a <see cref="API.Features.Items.Usable"/> item.
@@ -1057,12 +1073,6 @@ namespace Exiled.Events.Handlers
         public static void OnPlayerDamageWindow(DamagingWindowEventArgs ev) => DamagingWindow.InvokeSafely(ev);
 
         /// <summary>
-        /// Called before a <see cref="API.Features.Player"/> damage a window.
-        /// </summary>
-        /// <param name="ev">The <see cref="DamagingDoorEventArgs"/> instance. </param>
-        public static void OnDamagingDoor(DamagingDoorEventArgs ev) => DamagingDoor.InvokeSafely(ev);
-
-        /// <summary>
         /// Called before a <see cref="API.Features.Player"/> unlocks a generator.
         /// </summary>
         /// <param name="ev">The <see cref="UnlockingGeneratorEventArgs"/> instance. </param>
@@ -1141,6 +1151,18 @@ namespace Exiled.Events.Handlers
         public static void OnHurt(HurtEventArgs ev) => Hurt.InvokeSafely(ev);
 
         /// <summary>
+        /// Called before a <see cref="API.Features.Player"/> is healed.
+        /// </summary>
+        /// <param name="ev">The <see cref="HealingEventArgs"/> instance. </param>
+        public static void OnHealing(HealingEventArgs ev) => Healing.InvokeSafely(ev);
+
+        /// <summary>
+        /// Called after a <see cref="API.Features.Player"/> is healed.
+        /// </summary>
+        /// <param name="ev">The <see cref="HealedEventArgs"/> instance. </param>
+        public static void OnHealed(HealedEventArgs ev) => Healed.InvokeSafely(ev);
+
+        /// <summary>
         /// Called before a <see cref="API.Features.Player"/> dies.
         /// </summary>
         /// <param name="ev">The <see cref="DyingEventArgs"/> instance. </param>
@@ -1175,6 +1197,12 @@ namespace Exiled.Events.Handlers
         /// </summary>
         /// <param name="ev">The <see cref="DisplayingHitmarkerEventArgs"/> instance.</param>
         public static void OnShowingHitMarker(DisplayingHitmarkerEventArgs ev) => ShowingHitMarker.InvokeSafely(ev);
+
+        /// <summary>
+        /// Called after a <see cref="API.Features.Player"/> toggles the weapon's flashlight.
+        /// </summary>
+        /// <param name="ev">The <see cref="ToggledWeaponFlashlightEventArgs"/> instance.</param>
+        public static void OnToggledWeaponFlashlight(ToggledWeaponFlashlightEventArgs ev) => ToggledWeaponFlashlight.InvokeSafely(ev);
 
         /// <summary>
         /// Called before pre-authenticating a <see cref="API.Features.Player"/>.

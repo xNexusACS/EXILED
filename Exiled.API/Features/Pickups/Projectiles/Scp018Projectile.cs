@@ -8,10 +8,9 @@
 namespace Exiled.API.Features.Pickups.Projectiles
 {
     using Exiled.API.Extensions;
+    using Exiled.API.Features.Core.Attributes;
     using Exiled.API.Interfaces;
-    using InventorySystem;
     using InventorySystem.Items.ThrowableProjectiles;
-    using UnityEngine;
 
     using BaseScp018Projectile = InventorySystem.Items.ThrowableProjectiles.Scp018Projectile;
 
@@ -59,6 +58,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <summary>
         /// Gets or sets the pickup's max velocity.
         /// </summary>
+        [EProperty(category: nameof(Scp018Projectile))]
         public float MaxVelocity
         {
             get => PhysicsModule._maxVel;
@@ -68,6 +68,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <summary>
         /// Gets or sets the pickup's velocity per bounce.
         /// </summary>
+        [EProperty(category: nameof(Scp018Projectile))]
         public float VelocityPerBounce
         {
             get => PhysicsModule._maxVel;
@@ -77,11 +78,13 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <summary>
         /// Gets a value indicating whether or not SCP-018 can injure teammates.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Scp018Projectile))]
         public bool IgnoreFriendlyFire => Base.IgnoreFriendlyFire;
 
         /// <summary>
         /// Gets or sets the time for SCP-018 not to ignore the friendly fire.
         /// </summary>
+        [EProperty(category: nameof(Scp018Projectile))]
         public float FriendlyFireTime
         {
             get => Base._friendlyFireTime;
@@ -91,6 +94,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <summary>
         /// Gets the current damage of SCP-018.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Scp018Projectile))]
         public float Damage => Base.CurrentDamage;
 
         /// <summary>

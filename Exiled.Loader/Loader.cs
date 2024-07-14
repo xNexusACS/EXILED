@@ -87,6 +87,8 @@ namespace Exiled.Loader
         public static void LoadPlugins()
         {
             File.Delete(Path.Combine(Paths.Plugins, "Exiled.Updater.dll"));
+            File.Delete(Path.Combine(Paths.Plugins, "Exiled.CustomRoles.dll"));
+            File.Delete(Path.Combine(Paths.Plugins, "Exiled.CustomItems.dll"));
 
             foreach (string assemblyPath in Directory.GetFiles(Paths.Plugins, "*.dll"))
             {
@@ -197,7 +199,7 @@ namespace Exiled.Loader
 
                     Log.Debug($"Instantiated type {type.FullName}");
 
-                    if (CheckPluginRequiredExiledVersion(plugin))
+                    if (CheckPluginRequiredExiledVersion(plugin, assembly.GetReferencedAssemblies()?.FirstOrDefault(x => x?.Name is "Exiled.Loader")?.Version ?? new()))
                         continue;
 
                     if (defaultPlayerClass is not null)
@@ -227,6 +229,24 @@ namespace Exiled.Loader
 
             return null;
         }
+
+        /// <summary>
+        /// Gets an <see cref="Plugin{TConfig}"/> instance.
+        /// </summary>
+        /// <typeparam name="T">A <see cref="Plugin{TConfig}"/> class to get the instance of.</typeparam>
+        /// <returns>Returns the instance of a <see cref="Plugin{TConfig}"/>.</returns>
+        public static T GetPlugin<T>()
+            where T : class, IPlugin<IConfig>
+            => Plugins.First(plugin => plugin is T) as T;
+
+        /// <summary>
+        /// Gets an <see cref="IConfig"/> instance.
+        /// </summary>
+        /// <typeparam name="T">A <see cref="IConfig"/> class to get the instance of.</typeparam>
+        /// <returns>Returns the instance of a <see cref="IConfig"/>.</returns>
+        public static T GetConfig<T>()
+            where T : class, IConfig
+            => Plugins.First(plugin => plugin.Config is T).Config as T;
 
         /// <summary>
         /// Enables all plugins.
@@ -423,12 +443,12 @@ namespace Exiled.Loader
             return false;
         }
 
-        private static bool CheckPluginRequiredExiledVersion(IPlugin<IConfig> plugin)
+        private static bool CheckPluginRequiredExiledVersion(IPlugin<IConfig> plugin, Version pluginVersion)
         {
             if (plugin.IgnoreRequiredVersionCheck)
                 return false;
 
-            Version requiredVersion = plugin.RequiredExiledVersion;
+            Version requiredVersion = plugin.RequiredExiledVersion == default ? pluginVersion : plugin.RequiredExiledVersion;
             Version actualVersion = Version;
 
             // Check Major version

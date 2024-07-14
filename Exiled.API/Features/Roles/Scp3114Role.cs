@@ -9,13 +9,16 @@ namespace Exiled.API.Features.Roles
 {
     using System.Collections.Generic;
 
+    using Exiled.API.Enums;
     using Exiled.API.Extensions;
+    using Exiled.API.Features.Core.Attributes;
     using PlayerRoles;
     using PlayerRoles.PlayableScps;
     using PlayerRoles.PlayableScps.HumeShield;
     using PlayerRoles.PlayableScps.Scp3114;
     using PlayerRoles.Subroutines;
     using PlayerStatsSystem;
+    using UnityEngine;
 
     using static PlayerRoles.PlayableScps.Scp3114.Scp3114Identity;
 
@@ -78,7 +81,17 @@ namespace Exiled.API.Features.Roles
             VoiceLines = scp3114VoiceLines;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Scp3114Role"/> class.
+        /// </summary>
+        /// <param name="gameObject">The <see cref="GameObject"/>.</param>
+        protected internal Scp3114Role(GameObject gameObject)
+            : base(gameObject)
+        {
+        }
+
         /// <inheritdoc/>
+        [EProperty(readOnly: true, category: nameof(Role))]
         public override RoleTypeId Type { get; } = RoleTypeId.Scp3114;
 
         /// <inheritdoc/>
@@ -135,6 +148,7 @@ namespace Exiled.API.Features.Roles
         /// <summary>
         /// Gets the damage amount of SCP-3114's slap ability.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Scp3114Role))]
         public float SlapDamage => Slap.DamageAmount;
 
         /// <summary>
@@ -145,6 +159,7 @@ namespace Exiled.API.Features.Roles
         /// <summary>
         /// Gets or sets the SCP-3114's Stolen Role.
         /// </summary>
+        [EProperty(category: nameof(Scp3114Role))]
         public RoleTypeId StolenRole
         {
             get => Identity.CurIdentity.StolenRole;
@@ -166,6 +181,7 @@ namespace Exiled.API.Features.Roles
         /// <summary>
         /// Gets or sets the SCP-3114's Ragdoll used for it's FakeIdentity.
         /// </summary>
+        [EProperty(category: nameof(Scp3114Role))]
         public Ragdoll Ragdoll
         {
             get => Ragdoll.Get(Identity.CurIdentity.Ragdoll);
@@ -179,6 +195,7 @@ namespace Exiled.API.Features.Roles
         /// <summary>
         /// Gets or sets the SCP-3114's UnitId used for it's FakeIdentity.
         /// </summary>
+        [EProperty(category: nameof(Scp3114Role))]
         public byte UnitId
         {
             get => Identity.CurIdentity.UnitNameId;
@@ -192,6 +209,7 @@ namespace Exiled.API.Features.Roles
         /// <summary>
         /// Gets or sets current state of SCP-3114's disguise ability.
         /// </summary>
+        [EProperty(category: nameof(Scp3114Role))]
         public DisguiseStatus DisguiseStatus
         {
             get => Identity.CurIdentity.Status;
@@ -205,6 +223,7 @@ namespace Exiled.API.Features.Roles
         /// <summary>
         /// Gets or sets the SCP-3114's Disguise duration.
         /// </summary>
+        [EProperty(category: nameof(Scp3114Role))]
         public float DisguiseDuration
         {
             get => Identity._disguiseDurationSeconds;
@@ -214,11 +233,17 @@ namespace Exiled.API.Features.Roles
         /// <summary>
         /// Gets or sets the warning time seconds.
         /// </summary>
+        [EProperty(category: nameof(Scp3114Role))]
         public float WarningTime
         {
             get => Identity._warningTimeSeconds;
             set => Identity._warningTimeSeconds = value;
         }
+
+        /// <summary>
+        /// Gets or sets the bound dance.
+        /// </summary>
+        internal DanceType DanceType { get; set; }
 
         /// <summary>
         /// Reset Scp3114 FakeIdentity.
@@ -249,8 +274,14 @@ namespace Exiled.API.Features.Roles
         public void StopDancing() => Dance.SendRpc(x => x.IsDancing = false);
 
         /// <summary>
-        /// Starts dancing.
+        /// Starts the dancing process.
         /// </summary>
-        public void StartDanging() => Dance.SendRpc(x => x.IsDancing = true);
+        /// <param name="danceType">The requested <see cref="DanceType"/>.</param>
+        public void StartDancing(DanceType danceType) => Dance.SendRpc((x) =>
+        {
+            x.IsDancing = true;
+            x._serverStartPos = new(Position);
+            DanceType = danceType;
+        });
     }
 }

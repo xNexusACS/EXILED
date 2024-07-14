@@ -14,6 +14,7 @@ namespace Exiled.API.Features
     using Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features.Core;
+    using Exiled.API.Features.Core.Attributes;
     using Exiled.API.Interfaces;
     using MapGeneration.Distributors;
     using UnityEngine;
@@ -21,7 +22,8 @@ namespace Exiled.API.Features
     /// <summary>
     /// Wrapper class for <see cref="Scp079Generator"/>.
     /// </summary>
-    public class Generator : GameEntity, IWrapper<Scp079Generator>, IWorldSpace
+    [EClass(category: nameof(Generator))]
+    public class Generator : GameEntity, IWrapper<Scp079Generator>
     {
         /// <summary>
         /// A <see cref="List{T}"/> of <see cref="Generator"/> on the map.
@@ -39,6 +41,16 @@ namespace Exiled.API.Features
             Base = scp079Generator;
             Scp079GeneratorToGenerator.Add(scp079Generator, this);
         }
+
+        /// <summary>
+        /// Gets the prefab's type.
+        /// </summary>
+        public static PrefabType PrefabType => PrefabType.GeneratorStructure;
+
+        /// <summary>
+        /// Gets the prefab's object.
+        /// </summary>
+        public static GameObject PrefabObject => PrefabHelper.PrefabToGameObject[PrefabType];
 
         /// <summary>
         /// Gets a <see cref="IEnumerable{T}"/> of <see cref="Generator"/> which contains all the <see cref="Generator"/> instances.
@@ -59,11 +71,13 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets the generator's <see cref="Room"/>.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Generator))]
         public Room Room => room ??= Room.FindParentRoom(GameObject);
 
         /// <summary>
-        /// Gets or sets the generator' state.
+        /// Gets or sets the generator's state.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public GeneratorState State
         {
             get => (GeneratorState)Base.Network_flags;
@@ -73,6 +87,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the generator's current time.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public short CurrentTime
         {
             get => Base.Network_syncTime;
@@ -82,16 +97,19 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets the generator's dropdown speed.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Generator))]
         public float DropdownSpeed => Base.DropdownSpeed;
 
         /// <summary>
         /// Gets a value indicating whether the generator is ready to be activated.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Generator))]
         public bool IsReady => Base.ActivationReady;
 
         /// <summary>
         /// Gets or sets a value indicating whether the generator is engaged.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public bool IsEngaged
         {
             get => Base.Engaged;
@@ -101,6 +119,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets a value indicating whether the generator is activating.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public bool IsActivating
         {
             get => Base.Activating;
@@ -110,6 +129,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets a value indicating whether the generator is open.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public bool IsOpen
         {
             get => Base.HasFlag(Base.Network_flags, Scp079Generator.GeneratorFlags.Open);
@@ -119,6 +139,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets a value indicating whether the generator is unlocked.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public bool IsUnlocked
         {
             get => Base.HasFlag(Base.Network_flags, Scp079Generator.GeneratorFlags.Unlocked);
@@ -128,6 +149,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the generator's lever delay.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public float LeverDelay
         {
             get => Base._leverDelay;
@@ -137,6 +159,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets current interaction cooldown.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public float InteractionCooldown
         {
             get => Base._targetCooldown;
@@ -146,6 +169,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the generator's activation time.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public float ActivationTime
         {
             get => Base._totalActivationTime;
@@ -155,6 +179,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the generator's deactivation time.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public float DeactivationTime
         {
             get => Base._totalDeactivationTime;
@@ -164,6 +189,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the cooldown to wait before toggling the generator's panel.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public float TogglePanelCooldown
         {
             get => Base._doorToggleCooldownTime;
@@ -173,6 +199,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the interaction cooldown to wait after unlocking the generator.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public float UnlockCooldown
         {
             get => Base._unlockCooldownTime;
@@ -182,6 +209,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the interaction cooldown to wait after failing the generator's unlock interaction.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public float DeniedUnlockCooldown
         {
             get => Base._deniedCooldownTime;
@@ -191,6 +219,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the last activator for the generator.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public Player LastActivator
         {
             get => Player.Get(Base._lastActivator.Hub);
@@ -200,20 +229,35 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets the generator position.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Generator))]
         public override Vector3 Position => Transform.position;
 
         /// <summary>
         /// Gets the generator rotation.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Generator))]
         public override Quaternion Rotation => Transform.rotation;
 
         /// <summary>
         /// Gets or sets the required permissions to interact with the generator.
         /// </summary>
+        [EProperty(category: nameof(Generator))]
         public KeycardPermissions KeycardPermissions
         {
             get => (KeycardPermissions)Base._requiredPermission;
             set => Base._requiredPermission = (Interactables.Interobjects.DoorUtils.KeycardPermissions)value;
+        }
+
+        /// <summary>
+        /// Spawns a <see cref="Generator"/>.
+        /// </summary>
+        /// <param name="position">The position to spawn it at.</param>
+        /// <param name="rotation">The rotation to spawn it as.</param>
+        /// <returns>The <see cref="Generator"/> that was spawned.</returns>
+        public static Generator Spawn(Vector3 position, Quaternion rotation = default)
+        {
+            Scp079Generator generator = PrefabHelper.Spawn<Scp079Generator>(PrefabType, position, rotation);
+            return Get(generator);
         }
 
         /// <summary>
@@ -298,10 +342,7 @@ namespace Exiled.API.Features
         {
             Interactables.Interobjects.DoorUtils.KeycardPermissions permission = (Interactables.Interobjects.DoorUtils.KeycardPermissions)flag;
 
-            if (isEnabled)
-                Base._requiredPermission |= permission;
-            else
-                Base._requiredPermission &= ~permission;
+            Base._requiredPermission = Base._requiredPermission.ModifyFlags(isEnabled, permission);
         }
 
         /// <summary>

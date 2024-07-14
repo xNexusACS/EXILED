@@ -12,21 +12,17 @@ namespace Exiled.API.Features.Items
     using System.Linq;
 
     using CameraShaking;
-
     using Enums;
-
+    using Exiled.API.Features.Core.Attributes;
     using Exiled.API.Features.Pickups;
     using Exiled.API.Interfaces;
     using Exiled.API.Structs;
-
     using Extensions;
-    using InventorySystem.Items;
     using InventorySystem.Items.Firearms;
     using InventorySystem.Items.Firearms.Attachments;
     using InventorySystem.Items.Firearms.Attachments.Components;
     using InventorySystem.Items.Firearms.BasicMessages;
     using InventorySystem.Items.Firearms.Modules;
-
     using UnityEngine;
 
     using BaseFirearm = InventorySystem.Items.Firearms.Firearm;
@@ -65,7 +61,7 @@ namespace Exiled.API.Features.Items
         {
             FirearmStatusFlags firearmStatusFlags = FirearmStatusFlags.MagazineInserted;
             if (Base.HasAdvantageFlag(AttachmentDescriptiveAdvantages.Flashlight))
-                firearmStatusFlags |= FirearmStatusFlags.FlashlightEnabled;
+                firearmStatusFlags.AddFlags(FirearmStatusFlags.FlashlightEnabled);
 
             Base.Status = new(Base.AmmoManagerModule.MaxAmmo, firearmStatusFlags, Base.GetCurrentAttachmentsCode());
         }
@@ -107,6 +103,7 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets or sets the amount of ammo in the firearm.
         /// </summary>
+        [EProperty(category: nameof(Firearm))]
         public byte Ammo
         {
             get => Base.Status.Ammo;
@@ -117,6 +114,7 @@ namespace Exiled.API.Features.Items
         /// Gets or sets the max ammo for this firearm.
         /// </summary>
         /// <remarks>Disruptor can't be used for MaxAmmo.</remarks>
+        [EProperty(category: nameof(Firearm))]
         public byte MaxAmmo
         {
             get => Base.AmmoManagerModule.MaxAmmo;
@@ -143,41 +141,57 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets the <see cref="Enums.FirearmType"/> of the firearm.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public FirearmType FirearmType => Type.GetFirearmType();
 
         /// <summary>
-        /// Gets the <see cref="Enums.AmmoType"/> of the firearm.
+        /// Gets or sets the <see cref="Enums.AmmoType"/> of the firearm.
         /// </summary>
-        public AmmoType AmmoType => Base.AmmoType.GetAmmoType();
+        [EProperty(category: nameof(Firearm))]
+        public AmmoType AmmoType
+        {
+            get => Base.AmmoType.GetAmmoType();
+            set
+            {
+                if (Base is AutomaticFirearm automaticFirearm)
+                    automaticFirearm._ammoType = value.GetItemType();
+            }
+        }
 
         /// <summary>
         /// Gets a value indicating whether the firearm is being aimed.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public bool Aiming => Base.AdsModule.ServerAds;
 
         /// <summary>
         /// Gets a value indicating whether the firearm Flashlight.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public bool HasFlashlight => Base.HasAdvantageFlag(AttachmentDescriptiveAdvantages.Flashlight);
 
         /// <summary>
         /// Gets a value indicating whether the firearm's flashlight module is enabled.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public bool FlashlightEnabled => Base.Status.Flags.HasFlagFast(FirearmStatusFlags.FlashlightEnabled);
 
         /// <summary>
         /// Gets a value indicating whether the firearm's NightVision is being used.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public bool NightVisionEnabled => Aiming && Base.HasAdvantageFlag(AttachmentDescriptiveAdvantages.NightVision);
 
         /// <summary>
         /// Gets a value indicating whether the firearm's flashlight module is enabled or NightVision is being used.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public bool CanSeeThroughDark => FlashlightEnabled || NightVisionEnabled;
 
         /// <summary>
         /// Gets a value indicating whether or not the firearm is automatic.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public bool IsAutomatic => Base is AutomaticFirearm;
 
         /// <summary>
@@ -188,6 +202,7 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets the <see cref="AttachmentIdentifier"/>s of the firearm.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public IEnumerable<AttachmentIdentifier> AttachmentIdentifiers
         {
             get
@@ -200,12 +215,14 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets the base code of the firearm.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public uint BaseCode => BaseCodesValue[FirearmType];
 
         /// <summary>
         /// Gets the fire rate of the firearm, if it is an automatic weapon.
         /// </summary>
         /// <seealso cref="IsAutomatic"/>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public float FireRate => Base is AutomaticFirearm auto ? auto._fireRate : 1f;
 
         /// <summary>
@@ -213,6 +230,7 @@ namespace Exiled.API.Features.Items
         /// </summary>
         /// <remarks>This property will not do anything if the firearm is not an automatic weapon.</remarks>
         /// <seealso cref="IsAutomatic"/>
+        [EProperty(category: nameof(Firearm))]
         public RecoilSettings Recoil
         {
             get => Base is AutomaticFirearm auto ? auto._recoil : default;
@@ -239,21 +257,25 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets the firearm's <see cref="FirearmRecoilPattern"/>. Will be <see langword="null"/> for non-automatic weapons.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public FirearmRecoilPattern RecoilPattern => Base is AutomaticFirearm auto ? auto._recoilPattern : null;
 
         /// <summary>
         /// Gets the <see cref="FirearmBaseStats"/>.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public FirearmBaseStats Stats => Base.BaseStats;
 
         /// <summary>
         /// Gets the base damage.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public float BaseDamage => Stats.BaseDamage;
 
         /// <summary>
         /// Gets the maximum value of the firearm's range.
         /// </summary>
+        [EProperty(readOnly: true, category: nameof(Firearm))]
         public float MaxRange => Stats.MaxDistance();
 
         /// <summary>
@@ -635,10 +657,8 @@ namespace Exiled.API.Features.Items
             Firearm cloneableItem = new(Type)
             {
                 Ammo = Ammo,
+                Recoil = Recoil,
             };
-
-            if (cloneableItem.Base is AutomaticFirearm)
-                cloneableItem.Recoil = Recoil;
 
             cloneableItem.AddAttachment(AttachmentIdentifiers);
 
@@ -669,6 +689,19 @@ namespace Exiled.API.Features.Items
 
             Base._sendStatusNextFrame = true;
             Base._footprintValid = false;
+        }
+
+        /// <inheritdoc/>
+        internal override void ReadPickupInfo(Pickup pickup)
+        {
+            base.ReadPickupInfo(pickup);
+
+            if (pickup is Pickups.FirearmPickup firearm)
+            {
+                Base.OnAdded(firearm.Base);
+                MaxAmmo = firearm.MaxAmmo;
+                AmmoType = firearm.AmmoType;
+            }
         }
     }
 }
