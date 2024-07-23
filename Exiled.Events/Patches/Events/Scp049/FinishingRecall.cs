@@ -38,6 +38,7 @@ namespace Exiled.Events.Patches.Events.Scp049
             int index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Newobj) + offset;
 
             Label returnLabel = generator.DefineLabel();
+            Label continueLabel = generator.DefineLabel();
 
             newInstructions.InsertRange(
                 index,
@@ -66,10 +67,19 @@ namespace Exiled.Events.Patches.Events.Scp049
                     // Handlers.Scp049.OnFinishingRecall(ev)
                     new(OpCodes.Call, Method(typeof(Handlers.Scp049), nameof(Handlers.Scp049.OnFinishingRecall))),
 
-                    // if (!ev.IsAllowed)
-                    //    return;
+                    // if (ev.IsAllowed)
+                    //    goto continueLabel;
                     new(OpCodes.Callvirt, PropertyGetter(typeof(FinishingRecallEventArgs), nameof(FinishingRecallEventArgs.IsAllowed))),
-                    new(OpCodes.Brfalse_S, returnLabel),
+                    new(OpCodes.Brtrue_S, continueLabel),
+
+                    // RagdollAbilityBase<Scp049Role>.CurRagdoll = null
+                    new(OpCodes.Ldnull),
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Call, PropertySetter(typeof(RagdollAbilityBase<Scp049Role>), nameof(RagdollAbilityBase<Scp049Role>.CurRagdoll))),
+                    new(OpCodes.Leave, returnLabel),
+
+                    // continueLabel
+                    new CodeInstruction(OpCodes.Nop).WithLabels(continueLabel),
                 });
 
             newInstructions[newInstructions.Count - 1].WithLabels(returnLabel);
