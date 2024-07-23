@@ -82,10 +82,10 @@ namespace Exiled.Events.Patches.Events.Scp049
                     new CodeInstruction(OpCodes.Nop).WithLabels(continueLabel),
                 });
 
-            newInstructions[newInstructions.Count - 1].WithLabels(returnLabel);
+            newInstructions[newInstructions.Count - 1].labels.Add(returnLabel);
 
-            for (int z = 0; z < newInstructions.Count; z++)
-                yield return newInstructions[z];
+            foreach (CodeInstruction instruction in newInstructions)
+                yield return instruction;
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
